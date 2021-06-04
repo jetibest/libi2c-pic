@@ -82,6 +82,27 @@ Lastly, the pins to use with I2C must be configured:
  - Enable Open-Drain on the chosen pins: (see `ODCONx` -> `ODxy`).
  
 
-## Example code
+## Getting started with example code
 
 See main.c for example code.
+To download and compile<sup>[1](#compile-note)</sup> the example code:
+
+```
+cd ~/Downloads/
+git clone https://github.com/jetibest/libi2c-pic
+cd libi2c-pic/
+make clean build
+```
+
+Get latest changes to repository using:
+
+```
+cd ~/Downloads/libi2c-pic/
+git pull
+make clean build
+```
+
+<a name="compile-note">1.</a>
+You need to install `git` and `xc8`.
+In order to install the XC8 compiler, [download the archive from Microchip's website](https://www.microchip.com/en-us/development-tools-tools-and-software/mplab-xc-compilers).
+Ensure that the `xc8` executable is in the PATH environment variable (e.g. `/opt/microchip/xc8/v2.05/bin`).
