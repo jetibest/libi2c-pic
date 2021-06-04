@@ -9,11 +9,13 @@
 #define _XTAL_FREQ 8000000
 
 #include <xc.h>
+#include <pic16f1614.h>
 
 #include "i2c_pic16f1614.h"
 
-// careful, device addresses 0,1,2 are invalid (3 is the minimum value).
-#define SSP1_I2C_DEVICE_ADDRESS 3
+// careful, device addresses below 8 are reserved
+// device addresses above 119
+#define SSP1_I2C_DEVICE_ADDRESS 8
 
 // Setup RC0 and RC1 pins for use with I2C (RC0 is clock, RC1 is data)
 void pins_init(void)

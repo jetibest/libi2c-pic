@@ -1,6 +1,6 @@
 #include "i2c_pic16f1614.h"
 
-// Note: address cannot be 0, 1, or 2.
+// Note: address must be within range 8-119 (inclusive)
 void SSP1_I2C_slave_init(unsigned char address)
 {
     // PIE1 [PERIPHERAL INTERRUPT ENABLE REGISTER 1] (pp. 98)
