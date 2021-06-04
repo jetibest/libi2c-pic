@@ -70,7 +70,7 @@ In your main program logic, you must initialize the I2C module like so:
 
 ```c
 // Setup MSSP registers for I2C as slave (using a 7-bit address)
-SSP1_I2C_slave_init(3); // parameter is I2C address and must be >2
+SSP1_I2C_slave_init(8); // parameter is I2C address and must be >8 and <120
 ```
 
 Lastly, the pins to use with I2C must be configured:
