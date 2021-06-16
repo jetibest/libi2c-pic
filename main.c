@@ -17,6 +17,9 @@
 // device addresses above 119
 #define SSP1_I2C_DEVICE_ADDRESS 8
 
+// Uncomment to use interrupt instead of while-loop in main()
+// #define USE_INTERRUPT
+
 // Setup RC0 and RC1 pins for use with I2C (RC0 is clock, RC1 is data)
 void pins_init(void)
 {
@@ -48,11 +51,31 @@ void pins_init(void)
     RC1PPS = 0b10001; // 10001: SDA
     
     
+    // Reset A-ports (to output, and set value to 1 for stability)
+    TRISA = 0; // 0: output (default is 1: input/tri-stated)
+    PORTA = 1; // set to 1 for stability
+    
+    
     // TRISC [PORTC TRI-STATE REGISTER] (pp. 165)
     
     // PORTC Tri-State Control bits
     TRISC0 = 1; // 1: PORTC pin configured as an input (tri-stated)
     TRISC1 = 1; // 1: PORTC pin configured as an input (tri-stated)
+    
+    
+    // Reset C-ports (to output, and set value to 1 for stability)
+    // C0 is used for SSP1
+    // C1 is used for SSP1
+    TRISCbits.TRISC2 = 0; // 0: output (default is 1: input/tri-stated)
+    TRISCbits.TRISC3 = 0; // 0: output (default is 1: input/tri-stated)
+    TRISCbits.TRISC4 = 0; // 0: output (default is 1: input/tri-stated)
+    TRISCbits.TRISC5 = 0; // 0: output (default is 1: input/tri-stated)
+    // C0 is used for SSP1
+    // C1 is used for SSP1
+    PORTCbits.RC2 = 1; // set to 1 for stability
+    PORTCbits.RC3 = 1; // set to 1 for stability
+    PORTCbits.RC4 = 1; // set to 1 for stability
+    PORTCbits.RC5 = 1; // set to 1 for stability
     
     
     // ODCONC [PORTC OPEN-DRAIN CONTROL REGISTER] (pp. 167)
@@ -62,16 +85,18 @@ void pins_init(void)
     ODCONCbits.ODC1 = 1; // 1: Port pin operates as open-drain drive (sink current only)
 }
 
-// Handle interrupts
+// Handle interrupts (alternative to while-loop in main)
 void __interrupt() interrupt_handler(void)
 {
     if(INTCONbits.PEIE == 1)
     {
+#ifdef USE_INTERRUPT
         if(PIE1bits.SSP1IE == 1 && PIR1bits.SSP1IF == 1)
         {
             // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
             SSP1_I2C_slave_handle_interrupt();
         }
+#endif /* USE_INTERRUPT */
     }
 }
 
@@ -82,11 +107,13 @@ void SSP1_I2C_slave_begin(unsigned char address)
     // so address must be equal to I2C_DEVICE_ADDRESS, and does not need to be tested again
 }
 
+// When reading from master, we wait for the end of transmission until we call this function with the gathered data
 void SSP1_I2C_slave_read(unsigned char* data, size_t length)
 {
     // by doing nothing, we keep the data stored in the buffer
 }
 
+// When writing to master, we prepare the whole buffer before any transmission, but the master decides how many bytes to read from it (I2C slave does not know in advance)
 void SSP1_I2C_slave_write(unsigned char* data)
 {
     // by doing nothing, the same buffer is written back
@@ -114,8 +141,19 @@ void main(void)
     // Setup MSSP registers for I2C as slave (using a 7-bit address)
     SSP1_I2C_slave_init(SSP1_I2C_DEVICE_ADDRESS);
     
-    // 
-    while(1);
+    while(1)
+    {
+#ifndef USE_INTERRUPT
+        
+        // Poll for I2C message flag (or alternatively define USE_INTERRUPT in order to use the interrupt handler)
+        if(PIE1bits.SSP1IE == 1 && PIR1bits.SSP1IF == 1)
+        {
+            // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
+            SSP1_I2C_slave_handle_interrupt();
+        }
+        
+#endif /* USE_INTERRUPT */
+    }
     
     
     return;

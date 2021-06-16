@@ -56,7 +56,7 @@ void SSP1_I2C_slave_init(unsigned char address)
     // Buffer Overwrite Enable bit
     SSP1CON3bits.BOEN = 0; // 0: SSP1BUF is only updated when SSPOV is clear
     // SDA Hold Time Selection bit [hint: set to 300ns on buses with large capacitance]
-    SSP1CON3bits.SDAHT = 0; // 0: Minimum of 100 ns hold time on SDA after the falling edge of SCL
+    SSP1CON3bits.SDAHT = 1; // 1: Minimum of 300 ns hold time on SDA after the falling edge of SCL
     // Slave Mode Bus Collision Detect Enable bit; upon collision, PIR2bits.BCL1IF is set, and bus goes idle
     SSP1CON3bits.SBCDE = 1; // 1: Enable slave bus collision interrupts
     // Address Hold Enable bit
@@ -83,7 +83,8 @@ void SSP1_I2C_slave_handle_interrupt()
     // SSP1IF: Synchronous Serial Port (MSSP) Interrupt Flag bit
     if(PIR1bits.SSP1IF == 1) // 1: Interrupt is pending
     {
-        // Hold clock (automatically set to zero if SSP1CON2bits.SEN == 1)
+        // Hold clock (clock stretching must be enabled: SSP1CON2bits.SEN == 1)
+        // This is redundant in both AHEN/DHEN=1, and SEN=1 (two separate cases, see pp. 279 vs pp. 280 vs pp. 281)
         SSP1CON1bits.CKP = 0;
         
         // Error: Handle overflow or collision
@@ -103,8 +104,8 @@ void SSP1_I2C_slave_handle_interrupt()
         {
             if(SSP1STATbits.D_nA == 0) // 0: Indicates that the last byte received or transmitted was address
             {
-                // Wait for SSP1BUF to be transferred (redundant?)
-                while(SSP1STATbits.BF == 0); // 0: Receive not complete, SSP1BUF empty
+                // Wait for SSP1BUF to be transferred (redundant, use if no interrupt, but polling)
+                // while(SSP1STATbits.BF == 0); // 0: Receive not complete, SSP1BUF empty
                 
                 // read the previous value to clear the buffer, this is the address
                 // the address is already matched by the module, otherwise we were not interrupted
@@ -121,7 +122,7 @@ void SSP1_I2C_slave_handle_interrupt()
                 if(SSP1STATbits.R_nW == 0) // 0: Write (master will write, slave will read)
                 {
                     // buffer was full already, what are we going to do?
-                    if(__SSP1_I2C_slave_buffer_index > SSP1_I2C_SLAVE_MAX_BUFFER_LENGTH)
+                    if(__SSP1_I2C_slave_buffer_index >= SSP1_I2C_SLAVE_MAX_BUFFER_LENGTH)
                     {
 #ifdef SSP1_I2C_SLAVE_FLAG_OVERFLOW_OVERWRITE
                         __SSP1_I2C_slave_buffer_index = 0;
@@ -134,8 +135,8 @@ void SSP1_I2C_slave_handle_interrupt()
 #endif /* SSP1_I2C_SLAVE_FLAG_OVERFLOW_OVERWRITE */
                     }
                     
-                    // Wait for SSP1BUF to be transferred (redundant?)
-                    while(SSP1STATbits.BF == 0); // 0: Receive not complete, SSP1BUF empty
+                    // Wait for SSP1BUF to be transferred (redundant, use if no interrupt, but polling)
+                    // while(SSP1STATbits.BF == 0); // 0: Receive not complete, SSP1BUF empty
                     
                     // continue reading more bytes into buffer, clearing the BF flag
                     __SSP1_I2C_slave_buffer_data[__SSP1_I2C_slave_buffer_index++] = SSP1BUF;
@@ -150,8 +151,8 @@ void SSP1_I2C_slave_handle_interrupt()
                     SSP1_I2C_slave_write(__SSP1_I2C_slave_buffer_data); // first let the slave write to __I2C_slave_buffer_data
                 }
                 
-                // Wait for SSP1BUF to be cleared (redundant?)
-                while(SSP1STATbits.BF == 0); // 0: Data transmit complete (does not include the nACK and Stop bits), SSP1BUF is empty
+                // Wait for SSP1BUF to be cleared (redundant, use if no interrupt, but polling)
+                // while(SSP1STATbits.BF == 0); // 0: Data transmit complete (does not include the nACK and Stop bits), SSP1BUF is empty
                 
                 // prepare a byte to write to master
                 SSP1BUF = __SSP1_I2C_slave_buffer_data[__SSP1_I2C_slave_buffer_index++];
@@ -169,7 +170,7 @@ void SSP1_I2C_slave_handle_interrupt()
             SSP1_I2C_slave_end();
         }
         
-        // Reset interrupt flag here,
+        // Reset interrupt flag here, this avoids unwanted interrupts during processing of data.
         // SSP1IF: Synchronous Serial Port (MSSP) Interrupt Flag bit
         PIR1bits.SSP1IF = 0; // 0: No interrupt is pending
         
