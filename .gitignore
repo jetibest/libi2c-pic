@@ -1,5 +1,5 @@
 build/
 debug/
 dist/
-nbproject/
+nbproject/private/
 *.mc3
