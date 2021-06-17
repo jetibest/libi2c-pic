@@ -26,15 +26,15 @@ void pins_init(void)
     // OPTION_REG [OPTION REGISTER] (pp. 223)
     
     // negated Weak Pull-Up Enable bit
-    OPTION_REGbits.nWPUEN = 0; // 0: Weak pull-ups are enabled by individual WPUx latch values
+    OPTION_REGbits.nWPUEN = 1; // 0: Weak pull-ups are enabled by individual WPUx latch values
     
     
     // WPUC [WEAK PULL-UP PORTC REGISTER] (pp. 167)
     
     // Weak Pull-up Register bits (Port C 0-5)
     WPUC = 0; // 0: disable pull-ups on all ports
-    WPUCbits.WPUC0 = 1; // 1: Pull-up enabled
-    WPUCbits.WPUC1 = 1; // 1: Pull-up enabled
+    WPUCbits.WPUC0 = 0; // 1: Pull-up enabled
+    WPUCbits.WPUC1 = 0; // 1: Pull-up enabled
     
     
     // xxxPPS [PERIPHERAL XXX INPUT SELECTION] (pp. 172)
