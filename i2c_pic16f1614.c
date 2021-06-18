@@ -15,12 +15,36 @@ void SSP1_I2C_slave_init(unsigned char address)
     PIR1bits.SSP1IF = 0; // 0: Interrupt is not pending
     
     
+    // PIE2 [PERIPHERAL INTERRUPT ENABLE REGISTER 2] (pp. 99)
+    
+    // MSSP Bus Collision Interrupt Enable bit
+    PIE2bits.BCL1IE = 1; // 1: Enables the MSSP Bus Collision Interrupt
+    
+    
+    // PIR2 [PERIPHERAL INTERRUPT REQUEST REGISTER 2] (pp. 104)
+    
+    // BCL1IF: MSSP Bus Collision Interrupt Flag bit
+    PIR2bits.BCL1IF = 0; // 0: Interrupt is not pending
+    
+    
+    // SSP1ADD [MSSP ADDRESS AND BAUD RATE REGISTER] (pp. 312)
+    
+    // Address bits at 1-7, 0th bit is unused and ignored
+    SSP1ADD = address << 1; // 7-bit address
+     
+    
+    // SSP1MSK [SSP MASK REGISTER] (pp. 312)
+    
+    // Mask bits
+    SSP1MSK = 0b11111111;
+    
+    
     // SSP1STAT [SSP STATUS REGISTER] (pp. 308)
     
     // Slew rate control
     SSP1STATbits.SMP = 1; // 1: Slew rate control disabled; for Standard Speed mode (100 kHz and 1 MHz)
     // SMBus specification
-    SSP1STATbits.CKE = 0; // 0: Disable SMBus specific inputs
+    SSP1STATbits.CKE = 1; // 0: Disable SMBus specific inputs, 1: Enable input logic so that thresholds are compliant with SMBus specification
     
     
     // SSP1CON1 [SSP CONTROL REGISTER 1] (pp. 309)
@@ -30,7 +54,7 @@ void SSP1_I2C_slave_init(unsigned char address)
     // Receive Overflow Indicator bit
     SSP1CON1bits.SSPOV = 0; // 0: No overflow
     // Synchronous Serial Port Enable bit
-    SSP1CON1bits.SSPEN = 1; // 1: Enables the serial port and configures the SDA and SCL pins as the source of the serial port pins
+     SSP1CON1bits.SSPEN = 1; // 1: Enables the serial port and configures the SDA and SCL pins as the source of the serial port pins
     // Clock Polarity Select bit
     SSP1CON1bits.CKP = 1; // 1: Enable clock
     // Synchronous Serial Port Mode Select bits
@@ -39,12 +63,8 @@ void SSP1_I2C_slave_init(unsigned char address)
     
     // SSP1CON2 [SSP CONTROL REGISTER 2] (pp. 310)
     
-    // General Call Enable bit
-    SSP1CON2bits.GCEN = 0; // 0: General call address disabled
-    // Acknowledge Data bit
-    SSP1CON2bits.ACKDT = 0; // 0: Acknowledge
     // Stretch Enable bit
-    SSP1CON2bits.SEN = 1; // 1: Clock stretching is enabled for both slave transmit and slave receive (stretch enabled)
+     SSP1CON2bits.SEN = 1; // 1: Clock stretching is enabled for both slave transmit and slave receive (stretch enabled)
     
     
     // SSP1CON3 [SSP CONTROL REGISTER 3] (pp. 311)
@@ -53,39 +73,34 @@ void SSP1_I2C_slave_init(unsigned char address)
     SSP1CON3bits.PCIE = 1; // 1: Enable interrupt on detection of Stop condition
     // Start Condition Interrupt Enable bit
     SSP1CON3bits.SCIE = 1; // 1: Enable interrupt on detection of Start or Reset conditions
-    // Buffer Overwrite Enable bit
-    SSP1CON3bits.BOEN = 0; // 0: SSP1BUF is only updated when SSPOV is clear
     // SDA Hold Time Selection bit [hint: set to 300ns on buses with large capacitance]
     SSP1CON3bits.SDAHT = 1; // 1: Minimum of 300 ns hold time on SDA after the falling edge of SCL
     // Slave Mode Bus Collision Detect Enable bit; upon collision, PIR2bits.BCL1IF is set, and bus goes idle
     SSP1CON3bits.SBCDE = 1; // 1: Enable slave bus collision interrupts
-    // Address Hold Enable bit
-    SSP1CON3bits.AHEN = 0; // 0: Address holding is disabled. 1: Following the eight falling edge of SCL for a matching received address byte; CKP bit of the SSP1CON1 register will be cleared and the SCL will be held low
-    // Data Hold Enable bit
-    SSP1CON3bits.DHEN = 0; // 0: Data holding is disabled. 1: Following the eight falling edge of SCL for a received data byte; slave hardware clears the CKP bit of the SSP1CON1 register and SCL is held low
-    
-    
-    // SSP1ADD [MSSP ADDRESS AND BAUD RATE REGISTER] (pp. 312)
-    
-    // Address bits at 1-7, 0th bit is unused and ignored
-    SSP1ADD = address << 1; // 7-bit address
-    
-    
-    // SSP1MSK [SSP MASK REGISTER] (pp. 312)
-    
-    // Mask bits
-    SSP1MSK = 0b11111111;
 }
 
 // Slave reception protocol (pp. 277)
 void SSP1_I2C_slave_handle_interrupt()
 {
+    // BCL1IF: MSSP Bus Collision Interrupt Flag bit
+    if(PIR2bits.BCL1IF == 1) // 1: Interrupt is pending
+    {
+        // read the previous value to clear the buffer
+        __SSP1_I2C_slave_null = SSP1BUF;
+        
+        // Release the clock line
+        SSP1CON1bits.CKP = 1;
+        
+        // clear the interrupt flag
+        PIR2bits.BCL1IF = 0;
+    }
+    
     // SSP1IF: Synchronous Serial Port (MSSP) Interrupt Flag bit
     if(PIR1bits.SSP1IF == 1) // 1: Interrupt is pending
     {
         // Hold clock (clock stretching must be enabled: SSP1CON2bits.SEN == 1)
         // This is redundant in both AHEN/DHEN=1, and SEN=1 (two separate cases, see pp. 279 vs pp. 280 vs pp. 281)
-        SSP1CON1bits.CKP = 0;
+        // SSP1CON1bits.CKP = 0;
         
         // Error: Handle overflow or collision
         if(SSP1CON1bits.SSPOV == 1 || SSP1CON1bits.WCOL == 1)
@@ -170,11 +185,11 @@ void SSP1_I2C_slave_handle_interrupt()
             SSP1_I2C_slave_end();
         }
         
+        // Release the clock line
+        SSP1CON1bits.CKP = 1;
+        
         // Reset interrupt flag here, this avoids unwanted interrupts during processing of data.
         // SSP1IF: Synchronous Serial Port (MSSP) Interrupt Flag bit
         PIR1bits.SSP1IF = 0; // 0: No interrupt is pending
-        
-        // Release the clock line
-        SSP1CON1bits.CKP = 1; // 1: 
     }
 }

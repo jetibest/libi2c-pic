@@ -15,10 +15,10 @@
 
 // careful, device addresses below 8 are reserved
 // device addresses above 119
-#define SSP1_I2C_DEVICE_ADDRESS 8
+#define SSP1_I2C_DEVICE_ADDRESS 0x18
 
-// Uncomment to use interrupt instead of while-loop in main()
-// #define USE_INTERRUPT
+// Comment to use while-loop in main() instead of interrupt
+#define USE_INTERRUPT
 
 // Setup RC0 and RC1 pins for use with I2C (RC0 is clock, RC1 is data)
 void pins_init(void)
@@ -26,15 +26,15 @@ void pins_init(void)
     // OPTION_REG [OPTION REGISTER] (pp. 223)
     
     // negated Weak Pull-Up Enable bit
-    OPTION_REGbits.nWPUEN = 1; // 0: Weak pull-ups are enabled by individual WPUx latch values
+    OPTION_REGbits.nWPUEN = 1; // 0: Weak pull-ups are enabled by individual WPUx latch values, 1: All weak pull-ups are disabled (except MCLR, if it is enabled)
     
     
     // WPUC [WEAK PULL-UP PORTC REGISTER] (pp. 167)
     
     // Weak Pull-up Register bits (Port C 0-5)
     WPUC = 0; // 0: disable pull-ups on all ports
-    WPUCbits.WPUC0 = 0; // 1: Pull-up enabled
-    WPUCbits.WPUC1 = 0; // 1: Pull-up enabled
+    WPUCbits.WPUC0 = 0; // 0: Pull-up disabled, 1: Pull-up enabled
+    WPUCbits.WPUC1 = 0; // 0: Pull-up disabled, 1: Pull-up enabled
     
     
     // xxxPPS [PERIPHERAL XXX INPUT SELECTION] (pp. 172)
@@ -72,7 +72,7 @@ void pins_init(void)
     TRISCbits.TRISC5 = 0; // 0: output (default is 1: input/tri-stated)
     // C0 is used for SSP1
     // C1 is used for SSP1
-    PORTCbits.RC2 = 1; // set to 1 for stability
+    PORTCbits.RC2 = 0; // set to 1 if i2c communication
     PORTCbits.RC3 = 1; // set to 1 for stability
     PORTCbits.RC4 = 1; // set to 1 for stability
     PORTCbits.RC5 = 1; // set to 1 for stability
@@ -91,11 +91,8 @@ void __interrupt() interrupt_handler(void)
     if(INTCONbits.PEIE == 1)
     {
 #ifdef USE_INTERRUPT
-        if(PIE1bits.SSP1IE == 1 && PIR1bits.SSP1IF == 1)
-        {
-            // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
-            SSP1_I2C_slave_handle_interrupt();
-        }
+        // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
+        SSP1_I2C_slave_handle_interrupt();
 #endif /* USE_INTERRUPT */
     }
 }
@@ -105,6 +102,8 @@ void SSP1_I2C_slave_begin(unsigned char address)
     // startbit detected, and we received the address
     // due to the configuration, the hardware already filters out any address that does not match our specified I2C_DEVICE_ADDRESS
     // so address must be equal to I2C_DEVICE_ADDRESS, and does not need to be tested again
+    
+    PORTCbits.RC2 = 1;
 }
 
 // When reading from master, we wait for the end of transmission until we call this function with the gathered data
@@ -122,6 +121,8 @@ void SSP1_I2C_slave_write(unsigned char* data)
 void SSP1_I2C_slave_end(void)
 {
     // stopbit detected, we could do some cleanup, for instance, emptying the buffer etc.
+    
+    PORTCbits.RC2 = 0;
 }
 
 void main(void)
@@ -146,11 +147,8 @@ void main(void)
 #ifndef USE_INTERRUPT
         
         // Poll for I2C message flag (or alternatively define USE_INTERRUPT in order to use the interrupt handler)
-        if(PIE1bits.SSP1IE == 1 && PIR1bits.SSP1IF == 1)
-        {
-            // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
-            SSP1_I2C_slave_handle_interrupt();
-        }
+        // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
+        SSP1_I2C_slave_handle_interrupt();
         
 #endif /* USE_INTERRUPT */
     }
