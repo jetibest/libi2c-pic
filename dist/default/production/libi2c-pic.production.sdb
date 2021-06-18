@@ -1,0 +1,283 @@
+[p GLOBOPT AUTOSTATIC IEEE_DBL IEEE_FLT PIC14 PIC14E ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 16F1614 ]
+[d frameptr 6 ]
+"10 /opt/microchip/xc8/v2.05/pic/sources/c99/common/sprcadd.c
+[v ___fladd __fladd `(d  1 e 4 0 ]
+"4 /opt/microchip/xc8/v2.05/pic/sources/c99/common/Umul8_16.c
+[v __Umul8_16 _Umul8_16 `(ui  1 e 2 0 ]
+"4 /mnt/Elements/data/git/libi2c-pic/i2c_pic16f1614.c
+[v _SSP1_I2C_slave_init SSP1_I2C_slave_init `(v  1 e 1 0 ]
+"83
+[v _SSP1_I2C_slave_handle_interrupt SSP1_I2C_slave_handle_interrupt `(v  1 e 1 0 ]
+"24 /mnt/Elements/data/git/libi2c-pic/main.c
+[v _pins_init pins_init `(v  1 e 1 0 ]
+"89
+[v _interrupt_handler interrupt_handler `II(v  1 e 1 0 ]
+"100
+[v _SSP1_I2C_slave_begin SSP1_I2C_slave_begin `(v  1 e 1 0 ]
+"110
+[v _SSP1_I2C_slave_read SSP1_I2C_slave_read `(v  1 e 1 0 ]
+"116
+[v _SSP1_I2C_slave_write SSP1_I2C_slave_write `(v  1 e 1 0 ]
+"121
+[v _SSP1_I2C_slave_end SSP1_I2C_slave_end `(v  1 e 1 0 ]
+"128
+[v _main main `(v  1 e 1 0 ]
+"17 /mnt/Elements/data/git/libi2c-pic/i2c.h
+[v ___SSP1_I2C_slave_null __SSP1_I2C_slave_null `uc  1 e 1 0 ]
+"18
+[v ___SSP1_I2C_slave_address __SSP1_I2C_slave_address `uc  1 e 1 0 ]
+"19
+[v ___SSP1_I2C_slave_buffer_index __SSP1_I2C_slave_buffer_index `ui  1 e 2 0 ]
+"20
+[v ___SSP1_I2C_slave_buffer_data __SSP1_I2C_slave_buffer_data `[256]uc  1 e 256 @8432 ]
+[s S136 . 1 `uc 1 IOCIF 1 0 :1:0 
+`uc 1 INTF 1 0 :1:1 
+`uc 1 TMR0IF 1 0 :1:2 
+`uc 1 IOCIE 1 0 :1:3 
+`uc 1 INTE 1 0 :1:4 
+`uc 1 TMR0IE 1 0 :1:5 
+`uc 1 PEIE 1 0 :1:6 
+`uc 1 GIE 1 0 :1:7 
+]
+"374 /opt/microchip/xc8/v2.05/pic/include/pic16f1614.h
+[s S145 . 1 `uc 1 . 1 0 :2:0 
+`uc 1 T0IF 1 0 :1:2 
+`uc 1 . 1 0 :2:3 
+`uc 1 T0IE 1 0 :1:5 
+]
+[u S150 . 1 `S136 1 . 1 0 `S145 1 . 1 0 ]
+[v _INTCONbits INTCONbits `VES150  1 e 1 @11 ]
+"429
+[v _PORTA PORTA `VEuc  1 e 1 @12 ]
+[s S102 . 1 `uc 1 RC0 1 0 :1:0 
+`uc 1 RC1 1 0 :1:1 
+`uc 1 RC2 1 0 :1:2 
+`uc 1 RC3 1 0 :1:3 
+`uc 1 RC4 1 0 :1:4 
+`uc 1 RC5 1 0 :1:5 
+]
+"494
+[u S109 . 1 `S102 1 . 1 0 ]
+[v _PORTCbits PORTCbits `VES109  1 e 1 @14 ]
+[s S260 . 1 `uc 1 TMR1IF 1 0 :1:0 
+`uc 1 TMR2IF 1 0 :1:1 
+`uc 1 CCP1IF 1 0 :1:2 
+`uc 1 SSP1IF 1 0 :1:3 
+`uc 1 TXIF 1 0 :1:4 
+`uc 1 RCIF 1 0 :1:5 
+`uc 1 ADIF 1 0 :1:6 
+`uc 1 TMR1GIF 1 0 :1:7 
+]
+"546
+[u S269 . 1 `S260 1 . 1 0 ]
+[v _PIR1bits PIR1bits `VES269  1 e 1 @16 ]
+[s S300 . 1 `uc 1 CCP2IF 1 0 :1:0 
+`uc 1 TMR4IF 1 0 :1:1 
+`uc 1 TMR6IF 1 0 :1:2 
+`uc 1 BCL1IF 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 C1IF 1 0 :1:5 
+`uc 1 C2IF 1 0 :1:6 
+]
+"607
+[u S308 . 1 `S300 1 . 1 0 ]
+[v _PIR2bits PIR2bits `VES308  1 e 1 @17 ]
+"1546
+[v _TRISA TRISA `VEuc  1 e 1 @140 ]
+[s S85 . 1 `uc 1 TRISC0 1 0 :1:0 
+`uc 1 TRISC1 1 0 :1:1 
+`uc 1 TRISC2 1 0 :1:2 
+`uc 1 TRISC3 1 0 :1:3 
+`uc 1 TRISC4 1 0 :1:4 
+`uc 1 TRISC5 1 0 :1:5 
+]
+"1611
+[u S92 . 1 `S85 1 . 1 0 ]
+[v _TRISCbits TRISCbits `VES92  1 e 1 @142 ]
+[s S239 . 1 `uc 1 TMR1IE 1 0 :1:0 
+`uc 1 TMR2IE 1 0 :1:1 
+`uc 1 CCP1IE 1 0 :1:2 
+`uc 1 SSP1IE 1 0 :1:3 
+`uc 1 TXIE 1 0 :1:4 
+`uc 1 RCIE 1 0 :1:5 
+`uc 1 ADIE 1 0 :1:6 
+`uc 1 TMR1GIE 1 0 :1:7 
+]
+"1663
+[u S248 . 1 `S239 1 . 1 0 ]
+[v _PIE1bits PIE1bits `VES248  1 e 1 @144 ]
+[s S281 . 1 `uc 1 CCP2IE 1 0 :1:0 
+`uc 1 TMR4IE 1 0 :1:1 
+`uc 1 TMR6IE 1 0 :1:2 
+`uc 1 BCL1IE 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 C1IE 1 0 :1:5 
+`uc 1 C2IE 1 0 :1:6 
+]
+"1724
+[u S289 . 1 `S281 1 . 1 0 ]
+[v _PIE2bits PIE2bits `VES289  1 e 1 @145 ]
+[s S22 . 1 `uc 1 PS 1 0 :3:0 
+`uc 1 PSA 1 0 :1:3 
+`uc 1 TMR0SE 1 0 :1:4 
+`uc 1 TMR0CS 1 0 :1:5 
+`uc 1 INTEDG 1 0 :1:6 
+`uc 1 nWPUEN 1 0 :1:7 
+]
+"1940
+[s S29 . 1 `uc 1 PS0 1 0 :1:0 
+`uc 1 PS1 1 0 :1:1 
+`uc 1 PS2 1 0 :1:2 
+`uc 1 . 1 0 :1:3 
+`uc 1 T0SE 1 0 :1:4 
+`uc 1 T0CS 1 0 :1:5 
+]
+[u S36 . 1 `S22 1 . 1 0 `S29 1 . 1 0 ]
+[v _OPTION_REGbits OPTION_REGbits `VES36  1 e 1 @149 ]
+"4333
+[v _WPUC WPUC `VEuc  1 e 1 @526 ]
+[s S55 . 1 `uc 1 WPUC0 1 0 :1:0 
+`uc 1 WPUC1 1 0 :1:1 
+`uc 1 WPUC2 1 0 :1:2 
+`uc 1 WPUC3 1 0 :1:3 
+`uc 1 WPUC4 1 0 :1:4 
+`uc 1 WPUC5 1 0 :1:5 
+]
+"4351
+[s S62 . 1 `uc 1 WPUA 1 0 :6:0 
+]
+[u S64 . 1 `S55 1 . 1 0 `S62 1 . 1 0 ]
+[v _WPUCbits WPUCbits `VES64  1 e 1 @526 ]
+"4391
+[v _SSP1BUF SSP1BUF `VEuc  1 e 1 @529 ]
+"4645
+[v _SSP1ADD SSP1ADD `VEuc  1 e 1 @530 ]
+"4899
+[v _SSP1MSK SSP1MSK `VEuc  1 e 1 @531 ]
+[s S321 . 1 `uc 1 BF 1 0 :1:0 
+`uc 1 UA 1 0 :1:1 
+`uc 1 R_nW 1 0 :1:2 
+`uc 1 S 1 0 :1:3 
+`uc 1 P 1 0 :1:4 
+`uc 1 D_nA 1 0 :1:5 
+`uc 1 CKE 1 0 :1:6 
+`uc 1 SMP 1 0 :1:7 
+]
+"5175
+[u S330 . 1 `S321 1 . 1 0 ]
+[v _SSP1STATbits SSP1STATbits `VES330  1 e 1 @532 ]
+[s S342 . 1 `uc 1 SSPM 1 0 :4:0 
+`uc 1 CKP 1 0 :1:4 
+`uc 1 SSPEN 1 0 :1:5 
+`uc 1 SSPOV 1 0 :1:6 
+`uc 1 WCOL 1 0 :1:7 
+]
+"5308
+[s S348 . 1 `uc 1 SSPM0 1 0 :1:0 
+`uc 1 SSPM1 1 0 :1:1 
+`uc 1 SSPM2 1 0 :1:2 
+`uc 1 SSPM3 1 0 :1:3 
+]
+[u S353 . 1 `S342 1 . 1 0 `S348 1 . 1 0 ]
+[v _SSP1CON1bits SSP1CON1bits `VES353  1 e 1 @533 ]
+[s S368 . 1 `uc 1 SEN 1 0 :1:0 
+`uc 1 RSEN 1 0 :1:1 
+`uc 1 PEN 1 0 :1:2 
+`uc 1 RCEN 1 0 :1:3 
+`uc 1 ACKEN 1 0 :1:4 
+`uc 1 ACKDT 1 0 :1:5 
+`uc 1 ACKSTAT 1 0 :1:6 
+`uc 1 GCEN 1 0 :1:7 
+]
+"5567
+[u S377 . 1 `S368 1 . 1 0 ]
+[v _SSP1CON2bits SSP1CON2bits `VES377  1 e 1 @534 ]
+[s S389 . 1 `uc 1 DHEN 1 0 :1:0 
+`uc 1 AHEN 1 0 :1:1 
+`uc 1 SBCDE 1 0 :1:2 
+`uc 1 SDAHT 1 0 :1:3 
+`uc 1 BOEN 1 0 :1:4 
+`uc 1 SCIE 1 0 :1:5 
+`uc 1 PCIE 1 0 :1:6 
+`uc 1 ACKTIM 1 0 :1:7 
+]
+"5689
+[u S398 . 1 `S389 1 . 1 0 ]
+[v _SSP1CON3bits SSP1CON3bits `VES398  1 e 1 @535 ]
+[s S119 . 1 `uc 1 ODC0 1 0 :1:0 
+`uc 1 ODC1 1 0 :1:1 
+`uc 1 ODC2 1 0 :1:2 
+`uc 1 ODC3 1 0 :1:3 
+`uc 1 ODC4 1 0 :1:4 
+`uc 1 ODC5 1 0 :1:5 
+]
+"5849
+[u S126 . 1 `S119 1 . 1 0 ]
+[v _ODCONCbits ODCONCbits `VES126  1 e 1 @654 ]
+"21376
+[v _SSPCLKPPS SSPCLKPPS `VEuc  1 e 1 @3616 ]
+"21420
+[v _SSPDATPPS SSPDATPPS `VEuc  1 e 1 @3617 ]
+"22256
+[v _RC0PPS RC0PPS `VEuc  1 e 1 @3744 ]
+"22300
+[v _RC1PPS RC1PPS `VEuc  1 e 1 @3745 ]
+"31240
+[v _TRISC0 TRISC0 `VEb  1 e 0 @1136 ]
+"31243
+[v _TRISC1 TRISC1 `VEb  1 e 0 @1137 ]
+"128 /mnt/Elements/data/git/libi2c-pic/main.c
+[v _main main `(v  1 e 1 0 ]
+{
+"158
+} 0
+"24
+[v _pins_init pins_init `(v  1 e 1 0 ]
+{
+"86
+} 0
+"4 /mnt/Elements/data/git/libi2c-pic/i2c_pic16f1614.c
+[v _SSP1_I2C_slave_init SSP1_I2C_slave_init `(v  1 e 1 0 ]
+{
+[v SSP1_I2C_slave_init@address address `uc  1 a 1 wreg ]
+[v SSP1_I2C_slave_init@address address `uc  1 a 1 wreg ]
+"9
+[v SSP1_I2C_slave_init@address address `uc  1 a 1 0 ]
+"80
+} 0
+"89 /mnt/Elements/data/git/libi2c-pic/main.c
+[v _interrupt_handler interrupt_handler `II(v  1 e 1 0 ]
+{
+"98
+} 0
+"83 /mnt/Elements/data/git/libi2c-pic/i2c_pic16f1614.c
+[v _SSP1_I2C_slave_handle_interrupt SSP1_I2C_slave_handle_interrupt `(v  1 e 1 0 ]
+{
+"195
+} 0
+"116 /mnt/Elements/data/git/libi2c-pic/main.c
+[v _SSP1_I2C_slave_write SSP1_I2C_slave_write `(v  1 e 1 0 ]
+{
+[v SSP1_I2C_slave_write@data data `*.39uc  1 p 2 0 ]
+"119
+} 0
+"110
+[v _SSP1_I2C_slave_read SSP1_I2C_slave_read `(v  1 e 1 0 ]
+{
+[v SSP1_I2C_slave_read@data data `*.39uc  1 p 2 0 ]
+[v SSP1_I2C_slave_read@length length `ui  1 p 2 2 ]
+"113
+} 0
+"121
+[v _SSP1_I2C_slave_end SSP1_I2C_slave_end `(v  1 e 1 0 ]
+{
+"126
+} 0
+"100
+[v _SSP1_I2C_slave_begin SSP1_I2C_slave_begin `(v  1 e 1 0 ]
+{
+"107
+} 0
