@@ -38,44 +38,21 @@ void SSP1_I2C_slave_end(void)
 }
 ```
 
-Global interrupts and peripheral interrupts must be enabled for I2C to work:
-
-```c
-// INTCON [INTERRUPT CONTROL REGISTER] (pp. 97)
-
-// Global Interrupt Enable bit
-INTCONbits.GIE = 1; // 1: Enables all active interrupts
-// Peripheral Interrupt Enable bit
-INTCONbits.PEIE = 1; // 1: Enables all active peripheral interrupts
-```
-
-Furthermore, your interrupt handler must include a call to `SSPx_I2C_slave_handle_interrupt();` like so:
-
-```c
-// Handle interrupts
-void __interrupt() interrupt_handler(void)
-{
-    if(INTCONbits.PEIE == 1)
-    {
-        if(PIE1bits.SSP1IE == 1 && PIR1bits.SSP1IF == 1)
-        {
-            // I2C_slave_handle_interrupt() calls either I2C_slave_read, I2C_slave_write, or nothing (in case of error etc.)
-            SSP1_I2C_slave_handle_interrupt();
-        }
-    }
-}
-```
-
 In your main program logic, you must initialize the I2C module like so:
 
 ```c
 // Setup MSSP registers for I2C as slave (using a 7-bit address)
-SSP1_I2C_slave_init(8); // parameter is I2C address and must be >8 and <120
+SSP1_I2C_slave_init(24); // parameter is I2C address and must be >7 and <120
 ```
+
+Note on **interrupts**:
+Global interrupts and peripheral interrupts must be enabled if the interrupt flags are handled by the interrupt handler.
+Furthermore, your interrupt handler must include a call to `SSPx_I2C_slave_handle_interrupt();` in the interrupt handler.
+However, if you choose to handle the interrupt in the main code, then the interrupts for the SSPx module must be disabled (`PIE1bits.SSP1IE = 0` and `PIE2bits.BCL1IE = 0` or simply disable any peripheral interrupt `INTCONbits.PEIE = 0`), after `SSP1_I2C_slave_init` was called.
+The interrupt flags are set and can be used, regardless of whether actual interrupt calls are enabled or not.
 
 Lastly, the pins to use with I2C must be configured:
 
- - Use a resistor or enable weak pull-up (see `OPTION_REGbits.nWPUEN` and `WPUx` registers) on both SCL (Serial Clock pin) and SDA (Serial Data pin).
  - Select input pins for the I2C module to use with the chosen pins (see `SSPCLKPPS` and `SSPDATPPS` for clock and data pins respectively).
  - Select output pins for the I2C module to use with the chosen pins (see `RxyPPS`, and set both pins to SCL and SDA functionality).
  - Set the chosen pins in the Tri-State register (see `TRISxy`) as input (tri-stated).
