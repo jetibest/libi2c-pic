@@ -30,7 +30,7 @@ void SSP1_I2C_slave_init(unsigned char address)
     // SSP1ADD [MSSP ADDRESS AND BAUD RATE REGISTER] (pp. 312)
     
     // Address bits at 1-7, 0th bit is unused and ignored
-    SSP1ADD = address << 1; // 7-bit address
+    SSP1ADD = (unsigned char) (address << 1); // 7-bit address
      
     
     // SSP1MSK [SSP MASK REGISTER] (pp. 312)
